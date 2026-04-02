@@ -180,24 +180,60 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.style.opacity = '0.7';
 
-            // Simulate API call
-            setTimeout(() => {
-                console.log('Form submitted:', { name, phone, email, product, quantity, message });
+            // Web3Forms API Call
+            const formData = new FormData();
+            formData.append('access_key', 'f0276997-d75f-4cef-b60c-3091d05a57c5');
+            formData.append('subject', 'Có khách hàng mới đăng ký nhận báo giá!');
+            formData.append('from_name', 'SmartRetail Website');
+            
+            formData.append('Họ và Tên', name);
+            formData.append('Số điện thoại', phone);
+            if(email) formData.append('Email', email);
+            formData.append('Kích thước màn hình', product);
+            if(quantity) formData.append('Số lượng', quantity);
+            if(message) formData.append('Nhu cầu cụ thể', message);
 
-                // Success state
-                formStatus.classList.add('show');
-                landingForm.reset();
-                submitBtn.innerHTML = '<i class="fas fa-check"></i> ĐÃ GỬI THÀNH CÔNG';
-                submitBtn.style.background = 'linear-gradient(135deg, #2ea44f, #3fb950)';
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async (response) => {
+                if (response.status == 200) {
+                    // Success state
+                    formStatus.classList.add('show');
+                    landingForm.reset();
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> ĐÃ GỬI THÀNH CÔNG';
+                    submitBtn.style.background = 'linear-gradient(135deg, #2ea44f, #3fb950)';
 
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.background = '';
+                        formStatus.classList.remove('show');
+                    }, 5000);
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> LỖI! VUI LÒNG GỌI HOTLINE';
+                    submitBtn.style.background = '#d32f2f';
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.background = '';
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                submitBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> LỖI MẠNG!';
+                submitBtn.style.background = '#d32f2f';
                 setTimeout(() => {
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                     submitBtn.style.opacity = '1';
                     submitBtn.style.background = '';
-                    formStatus.classList.remove('show');
-                }, 5000);
-            }, 1500);
+                }, 3000);
+            });
         });
     }
 
