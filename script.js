@@ -180,22 +180,26 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.style.opacity = '0.7';
 
-            // Web3Forms API Call
-            const formData = new FormData();
-            formData.append('access_key', 'f0276997-d75f-4cef-b60c-3091d05a57c5');
-            formData.append('subject', 'Có khách hàng mới đăng ký nhận báo giá!');
-            formData.append('from_name', 'SmartRetail Website');
-            
-            formData.append('Họ và Tên', name);
-            formData.append('Số điện thoại', phone);
-            if(email) formData.append('Email', email);
-            formData.append('Kích thước màn hình', product);
-            if(quantity) formData.append('Số lượng', quantity);
-            if(message) formData.append('Nhu cầu cụ thể', message);
+            // Web3Forms API Call (Using JSON to fix Vietnamese characters encoding issue)
+            const payload = {
+                access_key: 'f0276997-d75f-4cef-b60c-3091d05a57c5',
+                subject: 'Có khách hàng mới đăng ký nhận báo giá!',
+                from_name: 'SmartRetail Website',
+                'Họ và Tên': name,
+                'Số điện thoại': phone,
+                'Email': email || 'Không có',
+                'Kích thước màn hình': product + ' Inch',
+                'Số lượng': quantity || '1',
+                'Nhu cầu cụ thể': message || 'Không có'
+            };
 
             fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
             })
             .then(async (response) => {
                 if (response.status == 200) {
